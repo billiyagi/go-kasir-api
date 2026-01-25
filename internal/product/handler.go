@@ -55,15 +55,32 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getProducts godoc
+// @Summary Get all products
+// @Description Get a list of all products in inventory
+// @Tags products
+// @Produce json
+// @Success 200 {array} Product
+// @Router /products [get]
 func getProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(products)
 }
 
+// createProduct godoc
+// @Summary Create a new product
+// @Description Add a new product to the inventory
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param product body Product true "Product object that needs to be added"
+// @Success 201 {object} Product
+// @Failure 400 {object} map[string]string
+// @Router /products [post]
 func createProduct(w http.ResponseWriter, r *http.Request) {
 	var newProduct Product
 	if err := json.NewDecoder(r.Body).Decode(&newProduct); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -76,11 +93,21 @@ func createProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newProduct)
 }
 
+// getProductByID godoc
+// @Summary Get a product by ID
+// @Description Get details of a single product by its integer ID
+// @Tags products
+// @Produce json
+// @Param id path int true "Product ID"
+// @Success 200 {object} Product
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /products/{id} [get]
 func getProductByID(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/products/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid Product ID", http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid Product ID"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -92,20 +119,32 @@ func getProductByID(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Error(w, "Product not found", http.StatusNotFound)
+	http.Error(w, `{"error": "Product not found"}`, http.StatusNotFound)
 }
 
+// updateProduct godoc
+// @Summary Update an existing product
+// @Description Update details of an existing product by its ID
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path int true "Product ID"
+// @Param product body Product true "Product object with updated data"
+// @Success 200 {object} Product
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /products/{id} [put]
 func updateProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/products/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid Product ID", http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid Product ID"}`, http.StatusBadRequest)
 		return
 	}
 
 	var updatedProduct Product
 	if err := json.NewDecoder(r.Body).Decode(&updatedProduct); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -119,14 +158,23 @@ func updateProduct(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Error(w, "Product not found", http.StatusNotFound)
+	http.Error(w, `{"error": "Product not found"}`, http.StatusNotFound)
 }
 
+// deleteProduct godoc
+// @Summary Delete a product by ID
+// @Description Delete a single product by its integer ID
+// @Tags products
+// @Param id path int true "Product ID"
+// @Success 204 "No Content"
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /products/{id} [delete]
 func deleteProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/products/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid Product ID", http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid Product ID"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -138,5 +186,5 @@ func deleteProduct(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Error(w, "Product not found", http.StatusNotFound)
+	http.Error(w, `{"error": "Product not found"}`, http.StatusNotFound)
 }

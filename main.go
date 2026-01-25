@@ -8,12 +8,33 @@ import (
 
 	"go-kasir-api/internal/category"
 	"go-kasir-api/internal/product"
+
+	_ "go-kasir-api/docs" // Import generated docs
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title Go Kasir API
+// @version 1.0
+// @description This is a simple cashier API service.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /api
 func main() {
 	// Buat multiplexer (router) baru.
 	// Ini memungkinkan kita mendaftarkan handler secara modular.
 	mux := http.NewServeMux()
+
+	// Daftarkan handler untuk Swagger UI.
+	// URL-nya akan menjadi http://localhost:8080/swagger/index.html
+	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
 	// Daftarkan health check endpoint.
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
