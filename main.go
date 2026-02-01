@@ -5,11 +5,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
-	"go-kasir-api/internal/category"
+	"go-kasir-api/database"
+	"go-kasir-api/handlers"
 	"go-kasir-api/internal/product"
+	"go-kasir-api/repositories"
+	"go-kasir-api/services"
 
 	_ "go-kasir-api/docs" // Import generated docs
+
+	viper "github.com/spf13/viper"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -27,16 +34,62 @@ import (
 
 // @host localhost:8080
 // @BasePath /api
+
 func main() {
-	// Buat multiplexer (router) baru.
-	// Ini memungkinkan kita mendaftarkan handler secara modular.
+	// 1. Initialize Viper and Load Config
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	if _, err := os.Stat(".env"); err == nil {
+		viper.SetConfigFile(".env")
+		if err := viper.ReadInConfig(); err != nil {
+			log.Printf("Error reading config file: %v", err)
+		}
+	}
+
+	type Config struct {
+		Port   string `mapstructure:"PORT"`
+		DBConn string `mapstructure:"DB_CONN"`
+	}
+
+	config := Config{
+		Port:   viper.GetString("PORT"),
+		DBConn: viper.GetString("DB_CONN"),
+	}
+
+	// Default port if not set
+	if config.Port == "" {
+		config.Port = "8080"
+	}
+
+	// 2. Setup Database
+	if config.DBConn == "" {
+		log.Fatal("DB_CONN is not set in environment or config")
+	}
+
+	db, err := database.InitDB(config.DBConn)
+	if err != nil {
+		log.Fatal("Failed to initialize database:", err)
+	}
+	defer db.Close()
+
+	// 3. Initialize Injectors (Repositories, Services, Handlers)
+	// Product
+	productRepo := repositories.NewProductRepository(db)
+	productService := services.NewProductService(productRepo)
+	productHandler := handlers.NewProductHandler(productService)
+
+	// Category
+	categoryRepo := repositories.NewCategoryRepository(db)
+	categoryService := services.NewCategoryService(categoryRepo)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
+
+	// 4. Setup Router
 	mux := http.NewServeMux()
 
-	// Daftarkan handler untuk Swagger UI.
-	// URL-nya akan menjadi http://localhost:8080/swagger/index.html
+	// 5. Register Routes
 	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
-	// Daftarkan health check endpoint.
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
@@ -45,18 +98,26 @@ func main() {
 		})
 	})
 
-	// Daftarkan semua endpoint dari package product.
+	// Product Routes
+	mux.HandleFunc("/api/produk", productHandler.HandleProducts)
+	mux.HandleFunc("/api/produk/", productHandler.HandleProductByID)
+
+	// Category Routes
+	mux.HandleFunc("/api/categories", categoryHandler.HandleCategories)
+	mux.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
+
+	// Package specific routes (Legacy - can be removed if fully migrated)
 	product.RegisterHandlers(mux)
+	// category.RegisterHandlers(mux) // Removed legacy category handler
 
-	// Daftarkan semua endpoint dari package category.
-	category.RegisterHandlers(mux)
-
-	// Gunakan mux yang sudah dikonfigurasi untuk server.
+	// 6. Start Server
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + config.Port,
 		Handler: mux,
 	}
 
-	fmt.Println("Server listening on port 8080")
-	log.Fatal(server.ListenAndServe())
+	fmt.Printf("Server listening on port %s\n", config.Port)
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatal("Server failed to start:", err)
+	}
 }

@@ -1,0 +1,9 @@
+# Binaries
+go-kasir-api
+main
+
+# Environment
+.env
+
+# OS
+.DS_Store
