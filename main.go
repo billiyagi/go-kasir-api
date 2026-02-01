@@ -10,7 +10,6 @@ import (
 
 	"go-kasir-api/database"
 	"go-kasir-api/handlers"
-	"go-kasir-api/internal/product"
 	"go-kasir-api/repositories"
 	"go-kasir-api/services"
 
@@ -99,15 +98,15 @@ func main() {
 	})
 
 	// Product Routes
-	mux.HandleFunc("/api/produk", productHandler.HandleProducts)
-	mux.HandleFunc("/api/produk/", productHandler.HandleProductByID)
+	mux.HandleFunc("/api/products", productHandler.HandleProducts)
+	mux.HandleFunc("/api/products/", productHandler.HandleProductByID)
 
 	// Category Routes
 	mux.HandleFunc("/api/categories", categoryHandler.HandleCategories)
 	mux.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
 
 	// Package specific routes (Legacy - can be removed if fully migrated)
-	product.RegisterHandlers(mux)
+	// product.RegisterHandlers(mux) // Legacy removed
 	// category.RegisterHandlers(mux) // Removed legacy category handler
 
 	// 6. Start Server
