@@ -7,6 +7,13 @@ definitions:
       qty_terjual:
         type: integer
     type: object
+  models.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   models.DailyReport:
     properties:
       produk_terlaris:
@@ -67,6 +74,114 @@ info:
   title: Go Kasir API
   version: "1.0"
 paths:
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all categories or create a new category
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Category'
+            type: array
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Category'
+      summary: Get all categories or create a new one
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Get a list of all categories or create a new category
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Category'
+            type: array
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Category'
+      summary: Get all categories or create a new one
+      tags:
+      - categories
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Operations on a single category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "204":
+          description: No Content
+      summary: Get, Update, or Delete a category by ID
+      tags:
+      - categories
+    get:
+      consumes:
+      - application/json
+      description: Operations on a single category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "204":
+          description: No Content
+      summary: Get, Update, or Delete a category by ID
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Operations on a single category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "204":
+          description: No Content
+      summary: Get, Update, or Delete a category by ID
+      tags:
+      - categories
   /products:
     get:
       consumes:

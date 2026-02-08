@@ -18,6 +18,15 @@ func NewCategoryHandler(service *services.CategoryService) *CategoryHandler {
 }
 
 // HandleCategories handles list and create operations
+// @Summary Get all categories or create a new one
+// @Description Get a list of all categories or create a new category
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Category
+// @Success 201 {object} models.Category
+// @Router /categories [get]
+// @Router /categories [post]
 func (h *CategoryHandler) HandleCategories(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -30,6 +39,17 @@ func (h *CategoryHandler) HandleCategories(w http.ResponseWriter, r *http.Reques
 }
 
 // HandleCategoryByID handles get, update, and delete operations
+// @Summary Get, Update, or Delete a category by ID
+// @Description Operations on a single category
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Success 200 {object} models.Category
+// @Success 204 "No Content"
+// @Router /categories/{id} [get]
+// @Router /categories/{id} [put]
+// @Router /categories/{id} [delete]
 func (h *CategoryHandler) HandleCategoryByID(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
