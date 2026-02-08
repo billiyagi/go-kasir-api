@@ -72,6 +72,11 @@ func main() {
 	}
 	defer db.Close()
 
+	// Run Auto-Migration
+	if err := database.RunMigrations(db); err != nil {
+		log.Fatal("Failed to run migrations:", err)
+	}
+
 	// 3. Initialize Injectors (Repositories, Services, Handlers)
 	// Product
 	productRepo := repositories.NewProductRepository(db)
@@ -82,6 +87,11 @@ func main() {
 	categoryRepo := repositories.NewCategoryRepository(db)
 	categoryService := services.NewCategoryService(categoryRepo)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
+
+	// Transaction
+	transactionRepo := repositories.NewTransactionRepository(db)
+	transactionService := services.NewTransactionService(transactionRepo)
+	transactionHandler := handlers.NewTransactionHandler(transactionService)
 
 	// 4. Setup Router
 	mux := http.NewServeMux()
@@ -104,6 +114,10 @@ func main() {
 	// Category Routes
 	mux.HandleFunc("/api/categories", categoryHandler.HandleCategories)
 	mux.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
+
+	// Transaction Routes
+	mux.HandleFunc("/api/transactions", transactionHandler.HandleCreateTransaction)
+	mux.HandleFunc("/api/report/hari-ini", transactionHandler.HandleDailyReport)
 
 	// Package specific routes (Legacy - can be removed if fully migrated)
 	// product.RegisterHandlers(mux) // Legacy removed

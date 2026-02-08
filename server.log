@@ -1,0 +1,11 @@
+2026/02/08 23:26:38 Database connected successfully
+Server listening on port 8080
+2026/02/08 23:26:38 Server failed to start:listen tcp :8080: bind: address already in use
+2026/02/08 23:27:10 Database connected successfully
+Server listening on port 8080
+2026/02/08 23:28:54 Database connected successfully
+Server listening on port 8080
+2026/02/08 23:37:15 Database connected successfully
+2026/02/08 23:37:15 Database migrations executed successfully
+Server listening on port 8080
+2026/02/08 23:37:15 Server failed to start:listen tcp :8080: bind: address already in use
