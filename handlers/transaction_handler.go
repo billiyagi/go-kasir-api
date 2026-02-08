@@ -16,6 +16,17 @@ func NewTransactionHandler(service *services.TransactionService) *TransactionHan
 	return &TransactionHandler{service: service}
 }
 
+// HandleCreateTransaction creates a new transaction
+// @Summary Create a new transaction
+// @Description Create a new transaction with details
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Param transaction body models.Transaction true "Transaction Data"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {string} string "Invalid request body"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /transactions [post]
 func (h *TransactionHandler) HandleCreateTransaction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -42,6 +53,14 @@ func (h *TransactionHandler) HandleCreateTransaction(w http.ResponseWriter, r *h
 	})
 }
 
+// HandleDailyReport gets the daily sales report
+// @Summary Get daily sales report
+// @Description Get total revenue, total transactions, and best selling product for today
+// @Tags reports
+// @Produce json
+// @Success 200 {object} models.DailyReport
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /report/hari-ini [get]
 func (h *TransactionHandler) HandleDailyReport(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
